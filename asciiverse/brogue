@@ -1,0 +1,20 @@
+#!/bin/sh
+# Starts Brogue from an av install or a system package. Brogue keeps its
+# saves, recordings, high scores and keymap.txt in the current directory, so
+# this runs it from a folder of the player's own, the one upstream's
+# linux/brogue-multiuser.sh suggests, and puts the commented keymap.txt
+# there on first run for the player to edit.
+# av links ~/.local/bin/brogue to this file, so follow that link first.
+set -e
+self=$(readlink "$0" 2>/dev/null || printf '%s' "$0")
+dir=$(cd "$(dirname "$self")" && pwd)
+if [ -x "$dir/lib/brogue" ]; then
+  bin="$dir/lib/brogue" keymap="$dir/keymap.txt"          # av archive
+else
+  bin=/usr/lib/brogue/brogue keymap=/usr/share/brogue/keymap.txt   # .deb etc.
+fi
+userdir="${XDG_DATA_HOME:-$HOME/.local/share}/Brogue"
+mkdir -p "$userdir"
+[ -e "$userdir/keymap.txt" ] || cp "$keymap" "$userdir/keymap.txt"
+cd "$userdir"
+exec "$bin" "$@"

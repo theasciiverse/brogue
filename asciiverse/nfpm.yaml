@@ -1,0 +1,50 @@
+# System packages (.deb, .rpm, .apk, Arch) for Brogue's terminal version,
+# built by nfpm from the same static Linux build as the av archive. The
+# release workflow sets VERSION, RELEASE (our packaging release) and ARCH
+# (amd64 or arm64).
+#
+# /usr/bin/brogue is the start script (asciiverse/brogue): Brogue keeps its
+# files in the current directory, so the script runs the binary in
+# /usr/lib/brogue from ~/.local/share/Brogue.
+#
+# No .desktop file on purpose: av is the one place titles are started from,
+# so Asciiverse packages never add menu entries (asciiverse/CLAUDE.md).
+name: brogue
+arch: ${ARCH}
+platform: linux
+version: ${VERSION}
+release: ${RELEASE}
+section: games
+priority: optional
+maintainer: Asciiverse <packages@asciiverse.sh>
+vendor: Asciiverse
+homepage: https://github.com/theasciiverse/brogue
+license: AGPL-3.0-or-later
+description: |
+  Descend 26 levels for the Amulet of Yendor, and escape with it.
+  A single-player roguelike in a randomly generated dungeon, full of
+  monsters, allies, traps and artifacts; needs a 100x34 terminal. This is Brogue: Community Edition's
+  terminal (ncurses) version, by Brian Walker and the Brogue CE team,
+  packaged by Asciiverse.
+contents:
+  - src: asciiverse/brogue
+    dst: /usr/bin/brogue
+    file_info: { mode: 0755 }
+  - src: bin/brogue
+    dst: /usr/lib/brogue/brogue
+    file_info: { mode: 0755 }
+  - src: bin/keymap.txt
+    dst: /usr/share/brogue/keymap.txt
+    file_info: { mode: 0644 }
+  - src: LICENSE.txt
+    dst: /usr/share/doc/brogue/copyright
+    file_info: { mode: 0644 }
+  - src: README.md
+    dst: /usr/share/doc/brogue/README.md
+    file_info: { mode: 0644 }
+  - src: CHANGELOG.md
+    dst: /usr/share/doc/brogue/CHANGELOG.md
+    file_info: { mode: 0644 }
+  - src: PATCHES.md
+    dst: /usr/share/doc/brogue/PATCHES.md
+    file_info: { mode: 0644 }
