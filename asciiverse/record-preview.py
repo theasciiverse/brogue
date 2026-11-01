@@ -60,6 +60,20 @@ def pump(t):
 def key(k, wait=0.0):
     os.write(fd, k); pump(wait)
 
+def stop_game():
+    """Last resort: end the game under asciinema so the recording closes
+    instead of running on (and writing to the cast) after we leave."""
+    import signal
+    kids, todo = [], [pid]
+    while todo:
+        p = todo.pop()
+        try: ch = open(f"/proc/{p}/task/{p}/children").read().split()
+        except OSError: ch = []
+        kids += ch; todo += [int(c) for c in ch]
+    for k in reversed(kids):
+        try: os.kill(int(k), signal.SIGTERM)
+        except ProcessLookupError: pass
+
 def text():
     return "\n".join(screen.display)
 
@@ -132,8 +146,12 @@ if alive():
         key(b"\x1b", 1.0)       # don't save a recording
     wait_for("New Game", 5.0)
     pump(3.0)                   # back to the flames
-    key(b"q", 1.0)              # title: Quit
+    for _ in range(3):          # title: Quit
+        if not alive(): break
+        key(b"q", 1.5)
 for _ in range(30):
     if not alive(): break
     pump(0.2)
+if alive():
+    stop_game(); pump(1.0)
 shutil.rmtree(work, ignore_errors=True)
